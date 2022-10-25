@@ -1,7 +1,6 @@
 from workouts import program
 import sys
 import os
-import time
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtCore import *
@@ -27,6 +26,11 @@ class startScreen(QMainWindow):
             self.gotoScreen2()
     
     def initUI(self):
+        self.background = QLabel(self)
+        self.background.setFixedSize(QSize(800,500))
+        self.background.setStyleSheet("background-image : url(meme.jpg)")
+        self.background.hide()
+
         try:
             self.message = QLabel(self)
             self.message.setFixedSize(QSize(200,100))
@@ -79,7 +83,7 @@ class startScreen(QMainWindow):
         widget.setCurrentIndex(widget.currentIndex() + 1)
     
     def mystery(self):
-        pass
+        self.background.show()
 
 class timer(QMainWindow):
     def __init__(self):
@@ -87,6 +91,13 @@ class timer(QMainWindow):
         self.initUI()
     
     def initUI(self):
+        # Setting necessary variables
+        self.counter = 0
+        self.minute = '00'
+        self.second = '00'
+        self.count = '00'
+        self.startwatch = False
+
         # Title
         self.title = QLabel(self)
         self.title.setFixedSize(QSize(200,100))
@@ -94,12 +105,14 @@ class timer(QMainWindow):
         self.title.setFont(QFont('Arial', 30))
         self.title.move(350,20)
 
+        # Timer Object
+        timer = QTimer(self)
+        timer.timeout.connect(self.timeobject)
+        timer.start(100)
+
         # Time Display
-        self.timedisplay = QLabel(self)
-        self.timedisplay.setFixedSize(QSize(200,100))
-        self.timedisplay.setText('{}{}{}')
-        self.timedisplay.setFont(QFont('Arial', 30))
-        self.timedisplay.move(350,200)
+        self.label = QLabel(self)
+        self.label.move(350,200)
 
         # Start button
         self.startbutton = QPushButton(self)
@@ -108,16 +121,16 @@ class timer(QMainWindow):
         self.startbutton.clicked.connect(self.startTimer)
 
         # Stop button
-        self.backbutton = QPushButton(self)
-        self.backbutton.move(350,350)
-        self.backbutton.setText('Stop')
-        self.backbutton.clicked.connect(self.stopTimer)
+        self.stopbutton = QPushButton(self)
+        self.stopbutton.move(350,350)
+        self.stopbutton.setText('Stop')
+        self.stopbutton.clicked.connect(self.stopTimer)
 
         # Reset button
-        self.backbutton = QPushButton(self)
-        self.backbutton.move(550,350)
-        self.backbutton.setText('Reset')
-        self.backbutton.clicked.connect(self.resetTimer)
+        self.resetbutton = QPushButton(self)
+        self.resetbutton.move(550,350)
+        self.resetbutton.setText('Reset')
+        self.resetbutton.clicked.connect(self.resetTimer)
 
         # Back button
         self.backbutton = QPushButton(self)
@@ -125,14 +138,49 @@ class timer(QMainWindow):
         self.backbutton.setText('Back')
         self.backbutton.clicked.connect(self.gotoHomeScreen)
     
+    def timeobject(self):
+        # Check the value of startWatch  variable to start or stop the Stop Watch
+        if self.startwatch:
+            # Increment counter by 1
+            self.counter += 1
+
+            # Count and set the time counter value
+            cnt = int((self.counter/10 - int(self.counter/10))*10)
+            self.count = '0' + str(cnt)
+
+            # Set the second value
+            if int(self.counter/10) < 10 :
+                self.second = '0' + str(int(self.counter / 10))
+            else:
+                self.second = str(int(self.counter / 10))
+                # Set the minute value
+                if self.counter / 10 == 60.0 :
+                    self.second == '00'
+                    self.counter = 0
+                    min = int(self.minute) + 1
+                    if min < 10 :
+                        self.minute = '0' + str(min)
+                    else:
+                        self.minute = str(min)
+
+        # Merge the mintue, second and count values
+        text = self.minute + ':' + self.second + ':' + self.count
+        # Display the stop watch values in the label
+        self.label.setText('<h1 style="color:black">' + text + '</h1>')
+
     def startTimer(self):
-        self.starttime = time.time()
+        self.startwatch = True
 
     def stopTimer(self):
-        self.elapsedtime = time.time()
+        self.startwatch = False
 
     def resetTimer(self):
-        pass
+        self.startwatch = False
+        self.counter = 0
+        self.minute = '00'
+        self.second = '00'
+        self.count = '00'
+        
     
     def gotoHomeScreen(self):
         homeScreen = startScreen()
@@ -531,14 +579,11 @@ class newPage(QMainWindow):
             f = open("prs.txt", 'a')
             f.write(self.keep)
             f.close()
-            self.gotoMainMenu()
-            mainWindow = mainMenu()
-            widget.addWidget(mainWindow)
-            widget.setCurrentIndex(widget.currentIndex()+1)
+            self.gotoHomeScreen()
     
-    def gotoMainMenu(self):
-        main_screen = mainMenu()
-        widget.addWidget(main_screen)
+    def gotoHomeScreen(self):
+        home_screen = startScreen()
+        widget.addWidget(home_screen)
         widget.setCurrentIndex(widget.currentIndex() + 1)
 
 if __name__ == "__main__":
@@ -551,5 +596,3 @@ if __name__ == "__main__":
     widget.setFixedSize(QSize(800,500)) 
     widget.show()
     sys.exit(app.exec())
-
-
