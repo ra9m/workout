@@ -1,1 +1,3 @@
-# Project is in it's beginner stages. Right now, it has dependencies (mostly PyQt), can be run using main.py with Python 3 installed.
+# Project is mostly complete (aside from background image not working).
+
+No dependencies are needed. Python is not required. To run the application, navigate to the "dist" folder, then the "main" folder, then run main.exe.
