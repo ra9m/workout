@@ -41,7 +41,7 @@ class startScreen(QMainWindow):
             self.message.setText('Welcome back, ' + self.name + '.')
             self.message.move(350,320)
         except AttributeError:
-            self.gotoScreen2()
+            self.gotoNewUserScreen()
 
         self.title = QLabel(self)
         self.title.setFixedSize(QSize(600,280))
